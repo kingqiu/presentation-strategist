@@ -1,0 +1,8 @@
+interface:
+  display_name: "汇报策略师"
+  short_description: "设计有逻辑、有证据、能说服人的汇报框架"
+  default_prompt: "Use $presentation-strategist to turn my rough presentation idea into a clear audience-aware storyline and slide-by-slide framework."
+
+policy:
+  allow_implicit_invocation: true
+
