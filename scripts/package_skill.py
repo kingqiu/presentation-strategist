@@ -23,6 +23,7 @@ TARGETS = {
 
 REQUIRED_FILES = [
     "SKILL.md",
+    "VERSION",
     "references/business-scenarios.md",
     "references/strategic-communication-principles.md",
     "references/handoff-schema.md",

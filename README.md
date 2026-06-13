@@ -1,5 +1,7 @@
 # 汇报策略师 Presentation Strategist
 
+当前版本：`v0.1.0`
+
 一个帮助你先想清楚“怎么讲”，再去制作 PPT 的 Agent Skill。
 
 很多 PPT 工具擅长让页面变漂亮，但真正困难的往往不是配色、字体和模板，而是：
