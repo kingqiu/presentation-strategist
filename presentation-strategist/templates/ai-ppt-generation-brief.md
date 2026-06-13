@@ -12,6 +12,7 @@ communication_goal:
 desired_audience_change:
 communication_task:
 business_scenario:
+delivery_mode:
 duration:
 slide_count:
 language:
@@ -25,6 +26,16 @@ evidence_sources:
 open_questions:
 ```
 
+## Input Convergence
+
+```yaml
+confirmed_facts:
+reasonable_assumptions:
+high_impact_unknowns:
+placeholders_that_must_not_be_invented:
+confidence_level:
+```
+
 ## Generation Guidance
 
 - Build one main idea per slide.
@@ -34,6 +45,7 @@ open_questions:
 - Label placeholders clearly where evidence is missing.
 - Do not invent data, customer names, financial numbers, or case results.
 - Preserve risk and uncertainty where stated.
+- Keep high-impact unknowns as placeholders; do not turn them into visible claims.
 
 ## Slides
 
@@ -89,4 +101,3 @@ appendix:
     suggested_visual:
     evidence_or_examples:
 ```
-

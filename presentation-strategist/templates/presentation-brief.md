@@ -4,6 +4,28 @@
 
 - 
 
+## Delivery Mode
+
+```yaml
+mode:
+reason:
+requested_slide_count:
+time_limit:
+```
+
+## Input Convergence
+
+| Type | Item | Impact On Framework | How To Validate |
+| --- | --- | --- | --- |
+| Confirmed fact |  |  |  |
+| Reasonable assumption |  |  |  |
+| High-impact unknown |  |  |  |
+
+```yaml
+confidence_level:
+safe_next_output:
+```
+
 ## Communication Diagnosis
 
 ```yaml
@@ -44,19 +66,33 @@ deadline_or_length:
 2. 
 3. 
 
-### Evidence Map
+### Material Triage
 
-| Claim | Evidence available | Missing proof | Objection | Confidence |
-| --- | --- | --- | --- | --- |
-|  |  |  |  |  |
+| Tier | Material / Point | Recommended Use | Reason |
+| --- | --- | --- | --- |
+| T1 Core claim |  | Main storyline |  |
+| T2 Support proof |  | Evidence slide |  |
+| T3 Appendix |  | Appendix |  |
+| T4 Noise / unverified |  | Exclude or validate |  |
+
+### Evidence Ledger
+
+| Claim | Evidence | Source | Freshness | Confidence | Gap | Decision Impact |
+| --- | --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |  |
 
 ## Risks And Constraints
 
 - 
+
+## Gap Analysis
+
+| Gap | Why It Matters | Impact On Argument | How To Validate | Owner / Source |
+| --- | --- | --- | --- | --- |
+|  |  |  |  |  |
 
 ## Next Validation Questions
 
 1. 
 2. 
 3. 
-

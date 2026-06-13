@@ -201,6 +201,7 @@ Best for:
 - training
 - knowledge sharing
 - onboarding
+- AI literacy sessions
 
 Pattern:
 
@@ -209,6 +210,48 @@ learner gap -> concept -> example -> practice -> feedback -> transfer
 ```
 
 Every teaching deck should end with a behavior the learner can perform.
+
+## AI Literacy Arc
+
+Best for:
+
+- company AI awareness training
+- 60-90 minute AI普及教育
+- mixed business audiences with uneven AI knowledge
+
+Pattern:
+
+```text
+why now -> simple mental model -> what AI can/cannot do -> business scenarios -> responsible use -> first experiment
+```
+
+Use this when the goal is not to make the audience technical experts, but to help them:
+
+- understand AI without jargon
+- reduce fear and hype
+- see relevance to their work
+- know safe boundaries
+- take a first useful action
+
+For 60 minutes:
+
+```text
+shared context -> simple model -> 3-5 relevant scenarios -> responsible use -> first action checklist
+```
+
+For 90 minutes:
+
+```text
+shared context -> simple model -> scenario examples -> mini demo/practice -> risks/boundaries -> team action plan
+```
+
+Avoid:
+
+- long AI history
+- algorithm lectures
+- tool list without use cases
+- prompt tricks detached from business work
+- claiming AI can replace whole functions without evidence
 
 ## Option Comparison
 
@@ -225,4 +268,3 @@ decision criteria -> options -> tradeoffs -> recommendation -> validation / fall
 ```
 
 Do not present options before criteria.
-

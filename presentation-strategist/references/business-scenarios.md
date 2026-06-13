@@ -2,6 +2,82 @@
 
 Use scenarios as presets, not templates. Always override based on the concrete communication goal, evidence strength, audience resistance, and field.
 
+## Scenario Router
+
+Use this first when the user's wording is ambiguous.
+
+```yaml
+boss_or_executive_update:
+  user_signals: ["老板", "领导", "高层", "管理层", "项目进度", "资源", "预算", "延期", "风险"]
+  likely_task: review / warn / decide / align
+  default_output: five_slide_framework or standard_framework
+  proof_focus: status, variance, impact, options, ask
+  ending: decision, resource, alignment, or risk acceptance
+
+customer_sales_or_solution_pitch:
+  user_signals: ["客户", "商机", "销售", "方案", "PoC", "产品介绍", "解决方案", "采购", "评审"]
+  likely_task: sell / persuade / de-risk
+  default_output: standard_framework
+  proof_focus: customer pain, cost of status quo, differentiator, proof, low-risk next step
+  ending: discovery, demo, workshop, PoC, or solution review
+
+fundraising_or_business_plan:
+  user_signals: ["融资", "投资人", "BP", "路演", "商业计划"]
+  likely_task: persuade / de-risk
+  default_output: detailed_framework
+  proof_focus: problem, why now, traction, market, model, team, use of funds
+  ending: investor meeting, diligence, or funding ask
+
+company_or_product_intro:
+  user_signals: ["公司介绍", "产品介绍", "宣传", "官网介绍", "品牌介绍"]
+  likely_task: explain / persuade / build trust
+  default_output: five_slide_framework or standard_framework
+  proof_focus: audience problem, relevant capability, differentiation, proof, next action
+  ending: trust, contact, demo, partnership, or evaluation
+
+training_or_enablement:
+  user_signals: ["培训", "分享", "普及", "enablement", "课程", "工作坊"]
+  likely_task: teach / mobilize
+  default_output: standard_framework
+  proof_focus: learner gap, concept ladder, examples, practice, transfer
+  ending: practice, checklist, behavior change, or first experiment
+
+risk_or_bad_news:
+  user_signals: ["风险", "危机", "失败", "延期", "坏消息", "损失", "合规", "事故"]
+  likely_task: warn / decide / repair trust
+  default_output: detailed_framework
+  proof_focus: facts, uncertainty, impact, options, owner, monitoring
+  ending: decision, mitigation, escalation, or monitoring cadence
+
+career_or_personal_pitch:
+  user_signals: ["面试", "求职", "介绍自己", "作品集", "个人展示"]
+  likely_task: persuade / de-risk
+  default_output: five_slide_framework or talk_track
+  proof_focus: role need, fit thesis, proof stories, measurable outcomes, 90-day plan
+  ending: next interview step or role-fit conversation
+
+technical_review:
+  user_signals: ["技术评审", "架构", "方案比较", "选型", "委员会", "技术路线"]
+  likely_task: decide / de-risk
+  default_output: standard_framework
+  proof_focus: criteria, options, tradeoffs, risks, validation plan
+  ending: option approval, pilot, rollback, or decision gate
+```
+
+If two scenarios match, choose by desired audience action:
+
+```text
+buy/try -> customer_sales_or_solution_pitch
+approve/resources -> boss_or_executive_update
+invest -> fundraising_or_business_plan
+learn/practice -> training_or_enablement
+decide under risk -> risk_or_bad_news or technical_review
+trust/cooperate -> company_or_product_intro
+select candidate -> career_or_personal_pitch
+```
+
+If the scenario is still unclear, use `quick_answer` with input convergence and ask up to 3 questions.
+
 ## Boss-Facing Update
 
 ```yaml
@@ -72,6 +148,27 @@ recommended_structure: who we serve -> why we matter -> what we do -> proof -> w
 common_failure_modes: history dump, slogan-heavy, no audience-specific reason to care
 ```
 
+Anti-generic rule:
+
+```text
+Do not organize company introduction around the company's autobiography. Organize around the audience's reason to trust and the next action the company wants.
+```
+
+Choose structure by audience:
+
+```yaml
+potential_customer:
+  structure: audience problem -> relevant capability -> proof -> cooperation path
+investor:
+  structure: market thesis -> company position -> traction/proof -> business model -> ask
+partner:
+  structure: shared opportunity -> complementary strengths -> cooperation model -> next step
+candidate:
+  structure: mission -> culture/tradeoffs -> growth opportunity -> why join
+general_brand:
+  structure: belief -> capability -> proof -> public meaning
+```
+
 ## Fundraising Pitch
 
 ```yaml
@@ -115,6 +212,27 @@ proof_standard: learner gap, concept ladder, examples, practice, transfer checkl
 recommended_structure: learner problem -> concept ladder -> example -> practice -> recap -> application
 common_failure_modes: encyclopedia content, no practice, no behavior change
 ```
+
+Subtypes:
+
+```yaml
+ai_literacy_for_companies:
+  use_when: company wants a 60-90 minute AI awareness or enablement session for non-AI or mixed business audiences
+  likely_goal: build shared AI understanding, reduce anxiety, show practical business entry points, and motivate responsible experimentation
+  likely_audience_state: curious but uneven; some excited, some anxious, some skeptical, many do not know where AI applies to their work
+  typical_resistance: too technical, too abstract, fear of replacement, tool hype, lack of relevance, compliance/security worries
+  proof_standard: simple mental models, concrete work scenarios, live/demo examples, do/don't boundaries, first-action checklist
+  recommended_structure: why AI matters now -> what AI can/cannot do -> how work changes -> company/role scenarios -> responsible use -> first experiments
+  common_failure_modes: model history lecture, tool list, prompt tricks only, fearmongering, no role-specific relevance, no next action
+```
+
+For AI literacy training, avoid a purely technical sequence such as "AI history -> model types -> algorithms -> tools". Instead, build a learning arc:
+
+```text
+curiosity/fear -> simple understanding -> business relevance -> role scenarios -> responsible practice -> first action
+```
+
+For 60 minutes, use 6-8 slides/sections. For 90 minutes, add interaction, group discussion, or mini practice.
 
 ## Strategy Announcement
 

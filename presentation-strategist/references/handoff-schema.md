@@ -38,11 +38,16 @@ audience_current_state:
 audience_desired_state:
 stakes:
 ask:
+input_convergence:
+delivery_mode:
 tone:
 slide_count:
 storyline:
 central_judgment:
 evidence_sources:
+evidence_ledger:
+material_triage:
+gap_analysis:
 slide_plan:
 open_questions:
 design_constraints:
@@ -79,7 +84,11 @@ recommended_fix:
 Always include:
 
 - assumptions made
+- confirmed facts, assumptions, high-impact unknowns, and slide implications
 - missing proof
+- evidence ledger for major claims
+- material triage when source material exists
+- gap analysis with decision impact
 - weak claims
 - unresolved objections
 - risks that must not be hidden
@@ -108,6 +117,7 @@ When writing for general AI PPT tools:
 - Mark optional appendix slides.
 - Do not include hidden reasoning or unsupported claims.
 - Clearly label missing data as placeholder or assumption.
+- Do not let assumptions become visible facts in generated slides.
 
 ## AI PPT Generation Brief Shape
 
@@ -128,6 +138,7 @@ deck:
   central_judgment:
   key_messages:
   evidence_sources:
+  input_convergence:
   open_questions:
 slides:
   - slide:
