@@ -164,8 +164,31 @@ python3 presentation-strategist/scripts/validate_skill_package.py presentation-s
 - `presentation-strategist/scripts/score_outputs.py`：自动评分并生成失败标签。
 - `presentation-strategist/scripts/propose_candidate_edit.py`：根据失败标签提出小范围候选修改。
 - `presentation-strategist/scripts/gate_candidate.py`：比较当前版本和候选版本，决定接受或拒绝。
+- `presentation-strategist/scripts/summarize_evolution.py`：汇总进化日志，生成最近 N 轮的可读报告。
 
 每一轮进化都会写入 `evaluation/runs/` 下的详细产物，并追加到 `evaluation/evolution_log.jsonl`。这些运行时记录不会进入发布包。
+
+最小手动流程：
+
+```text
+cd presentation-strategist
+scripts/run_validation.py --skill-dir . --run-name current --limit 3
+# 将模型输出放入 evaluation/runs/current/outputs/<sample-id>.md
+scripts/score_outputs.py --skill-dir . --run-name current
+scripts/propose_candidate_edit.py --skill-dir . --run-name current --create-candidate
+scripts/summarize_evolution.py --skill-dir . --limit 10
+```
+
+如果你的 agent CLI 支持非交互执行，也可以通过 `--agent-command` 自动生成输出：
+
+```text
+scripts/run_validation.py \
+  --skill-dir . \
+  --run-name current \
+  --agent-command 'your-agent < {prompt_file} > {output_file}'
+```
+
+`{prompt_file}`、`{output_file}`、`{sample_id}` 和 `{skill_dir}` 会由脚本自动填充。具体 CLI 参数请按你的 agent 环境调整。
 
 ## 日志与隐私
 

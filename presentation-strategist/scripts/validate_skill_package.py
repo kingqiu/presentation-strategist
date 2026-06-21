@@ -145,7 +145,15 @@ def validate_scripts(root: Path, errors: list[str]) -> None:
     if not scripts_dir.exists():
         error(errors, "Missing scripts directory.")
         return
-    expected = {"run_validation.py", "score_outputs.py", "propose_candidate_edit.py", "gate_candidate.py", "validate_skill_package.py", "package_skill.py"}
+    expected = {
+        "run_validation.py",
+        "score_outputs.py",
+        "propose_candidate_edit.py",
+        "gate_candidate.py",
+        "summarize_evolution.py",
+        "validate_skill_package.py",
+        "package_skill.py",
+    }
     found = {p.name for p in scripts_dir.glob("*.py")}
     missing = expected - found
     for name in sorted(missing):

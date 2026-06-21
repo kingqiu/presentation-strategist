@@ -27,6 +27,45 @@ Run the loop in five steps:
 5. After producing and scoring a candidate run, compare it:
    `scripts/gate_candidate.py --skill-dir . --current-run current --candidate-run candidate`
 
+## Agent Command Examples
+
+`run_validation.py` can either generate prompt files only, or execute an external agent command for each sample.
+
+Prompt-only mode:
+
+```bash
+scripts/run_validation.py --skill-dir . --run-name current --limit 3
+```
+
+Generic stdin-to-file command template:
+
+```bash
+scripts/run_validation.py \
+  --skill-dir . \
+  --run-name current \
+  --agent-command 'your-agent < {prompt_file} > {output_file}'
+```
+
+Codex-style template, if your Codex CLI supports non-interactive prompt execution:
+
+```bash
+scripts/run_validation.py \
+  --skill-dir . \
+  --run-name current \
+  --agent-command 'codex exec --full-auto --cd {skill_dir} < {prompt_file} > {output_file}'
+```
+
+Claude-style template, if your Claude CLI supports print/non-interactive mode:
+
+```bash
+scripts/run_validation.py \
+  --skill-dir . \
+  --run-name current \
+  --agent-command 'claude -p "$(cat {prompt_file})" > {output_file}'
+```
+
+Treat these as command templates. Adjust flags to match the agent CLI installed in your environment. The placeholders `{prompt_file}`, `{output_file}`, `{sample_id}`, and `{skill_dir}` are filled by `run_validation.py`.
+
 ## What Gets Recorded
 
 Each evolution round records both detailed artifacts and a compact ledger entry.
@@ -47,6 +86,13 @@ Cross-round ledgers:
 - `evaluation/rejected_edits.jsonl`: rejected candidates, tags, and full blocker reasons.
 
 Use `evolution_log.jsonl` as the first place to inspect progress over time. Use the per-run artifacts when you need to audit why a specific round was accepted or rejected.
+
+Generate a readable report:
+
+```bash
+scripts/summarize_evolution.py --skill-dir . --limit 10
+scripts/summarize_evolution.py --skill-dir . --limit 10 --out evaluation/evolution_report.md
+```
 
 ## Improvement Policy
 

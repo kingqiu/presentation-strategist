@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Added `summarize_evolution.py` to produce a readable report from evolution ledgers.
+- Added self-improvement `--agent-command` examples to the evaluation documentation.
+
+### Changed
+
+- Improved candidate edit generation to apply targeted section-level calibration patches instead of one centralized calibration block.
+- Updated package validation to require the evolution summary script.
+
 ## 0.1.0
 
 Initial public-ready skill package for `presentation-strategist`.
@@ -28,4 +40,3 @@ Initial public-ready skill package for `presentation-strategist`.
 
 - The self-improvement loop is agent-command driven. It can generate validation prompts by itself, but model outputs require either manual placement under `evaluation/runs/<run>/outputs/` or an external agent command passed through `--agent-command`.
 - Runtime logs and feedback records are intentionally excluded from release packages.
-
