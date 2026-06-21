@@ -15,6 +15,28 @@ This directory supports a self-improvement loop for the `presentation-strategist
 
 ## Self-Improvement Loop
 
+For normal use, start with the one-command wrapper:
+
+```bash
+scripts/improve_once.py --skill-dir . --limit 10 --mode report-only
+```
+
+Modes:
+
+- `report-only`: generate validation prompts, score available outputs, and produce a report. It never creates candidate edits.
+- `candidate`: score outputs and create a candidate skill copy. It does not accept the candidate.
+- `auto-gate`: compare current and candidate runs and record an accept/reject decision. Use only after candidate outputs have been generated and scored.
+
+If no `--agent-command` is provided, the wrapper creates prompts and waits for outputs under `evaluation/runs/<run>/outputs/`.
+
+Ask an agent in natural language:
+
+```text
+Run one presentation-strategist self-improvement cycle with 10 samples in report-only mode. Do not merge candidate edits.
+```
+
+The lower-level workflow is:
+
 Run the loop in five steps:
 
 1. Generate or execute validation tasks:

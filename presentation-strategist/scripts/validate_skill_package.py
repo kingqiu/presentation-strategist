@@ -150,6 +150,7 @@ def validate_scripts(root: Path, errors: list[str]) -> None:
         "score_outputs.py",
         "propose_candidate_edit.py",
         "gate_candidate.py",
+        "improve_once.py",
         "summarize_evolution.py",
         "validate_skill_package.py",
         "package_skill.py",

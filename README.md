@@ -156,10 +156,30 @@ python3 presentation-strategist/scripts/validate_skill_package.py presentation-s
 验证任务 -> 模型输出 -> 自动评分 -> 失败标签聚合 -> 候选修改 -> 门控接受/拒绝 -> 记录每轮结果
 ```
 
+如果你是普通用户，不需要记住所有底层脚本。可以直接让 Agent 代跑：
+
+```text
+帮我给 presentation-strategist 跑一轮自我进化，抽 10 条样本，只生成报告，不要合并修改。
+```
+
+或者使用一键入口：
+
+```text
+cd presentation-strategist
+scripts/improve_once.py --skill-dir . --limit 10 --mode report-only
+```
+
+常用模式：
+
+- `report-only`：只生成验证 prompt、评分已有输出、生成报告，不创建候选修改。
+- `candidate`：生成候选 skill 副本，但不接受修改。
+- `auto-gate`：在 current 和 candidate 都有分数后，自动记录接受/拒绝决策。
+
 相关文件：
 
 - `presentation-strategist/evaluation/validation_set.jsonl`：验证样本。
 - `presentation-strategist/evaluation/scoring-rubric.md`：100 分制评分规则。
+- `presentation-strategist/scripts/improve_once.py`：普通用户的一键自我进化入口。
 - `presentation-strategist/scripts/run_validation.py`：生成验证任务，或通过 `--agent-command` 调用外部 agent。
 - `presentation-strategist/scripts/score_outputs.py`：自动评分并生成失败标签；默认使用本地 deterministic scorer，也可以通过 `--judge-command` 接入 LLM judge。
 - `presentation-strategist/scripts/propose_candidate_edit.py`：根据失败标签提出小范围候选修改。
