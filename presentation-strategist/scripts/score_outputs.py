@@ -6,6 +6,8 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
+import tempfile
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,10 +24,32 @@ DIMENSIONS = {
 
 FAST_MODES = {"quick_answer", "talk_track", "five_slide_framework", "out_of_scope_response"}
 HIGH_STAKES = {"high"}
+VALID_FAILURE_TAGS = {
+    "wrong_scope",
+    "real_goal_missed",
+    "too_many_questions",
+    "too_verbose",
+    "too_shallow",
+    "wrong_delivery_mode",
+    "weak_input_convergence",
+    "assumption_as_fact",
+    "weak_evidence_handling",
+    "missing_risk_or_objection",
+    "generic_storyline",
+    "weak_action_titles",
+    "slide_jobs_unclear",
+    "handoff_not_actionable",
+    "invented_or_overstated_fact",
+    "prompt_extraction_leak",
+}
 
 
 def read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def clamp(value: int | float, low: int, high: int) -> int:
+    return max(low, min(high, int(round(value))))
 
 
 def contains_any(text: str, terms: list[str]) -> bool:
@@ -216,6 +240,7 @@ def score_one(text: str, sample: dict) -> dict:
     total = max(base - penalty, 0)
     return {
         "sample_id": sample["id"],
+        "scorer": "deterministic",
         "scenario": sample["scenario"],
         "stakes": sample["stakes"],
         "expected_delivery_mode": sample["expected_delivery_mode"],
@@ -228,15 +253,146 @@ def score_one(text: str, sample: dict) -> dict:
     }
 
 
+def judge_prompt(sample: dict, output_text: str, rubric_text: str) -> str:
+    return f"""You are judging one output from the presentation-strategist skill.
+
+Return JSON only. Do not include markdown fences.
+
+Rubric:
+{rubric_text}
+
+Validation sample:
+{json.dumps(sample, ensure_ascii=False, indent=2)}
+
+Model output to judge:
+{output_text}
+
+Return this JSON shape:
+{{
+  "dimension_scores": {{
+    "goal_and_audience": 0,
+    "input_convergence": 0,
+    "storyline": 0,
+    "evidence_and_risk": 0,
+    "slide_usability": 0,
+    "output_fit": 0
+  }},
+  "hard_penalty": 0,
+  "failure_tags": [],
+  "rationale": "brief reason"
+}}
+
+Dimension maximums:
+- goal_and_audience: 20
+- input_convergence: 15
+- storyline: 20
+- evidence_and_risk: 15
+- slide_usability: 20
+- output_fit: 10
+
+Use only failure tags listed in the rubric. Score strictly but fairly.
+"""
+
+
+def extract_json(text: str) -> dict:
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        stripped = re.sub(r"^```(?:json)?\s*", "", stripped)
+        stripped = re.sub(r"\s*```$", "", stripped)
+    try:
+        return json.loads(stripped)
+    except json.JSONDecodeError:
+        start = stripped.find("{")
+        end = stripped.rfind("}")
+        if start == -1 or end == -1 or end <= start:
+            raise
+        return json.loads(stripped[start : end + 1])
+
+
+def run_judge(command_template: str, prompt: str, sample_id: str, timeout: int) -> dict:
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        prompt_file = tmp_path / "judge_prompt.md"
+        output_file = tmp_path / "judge_output.json"
+        prompt_file.write_text(prompt, encoding="utf-8")
+        command = command_template.format(
+            prompt_file=str(prompt_file),
+            output_file=str(output_file),
+            sample_id=sample_id,
+        )
+        result = subprocess.run(command, shell=True, timeout=timeout, capture_output=True, text=True)
+        if result.returncode != 0:
+            raise RuntimeError(f"judge command failed with exit code {result.returncode}: {result.stderr.strip()}")
+        raw = output_file.read_text(encoding="utf-8") if output_file.exists() else result.stdout
+        return extract_json(raw)
+
+
+def normalize_judge_result(judged: dict, sample: dict, output_text: str) -> dict:
+    raw_dimensions = judged.get("dimension_scores", {})
+    dimension_scores = {
+        "goal_and_audience": clamp(raw_dimensions.get("goal_and_audience", 0), 0, 20),
+        "input_convergence": clamp(raw_dimensions.get("input_convergence", 0), 0, 15),
+        "storyline": clamp(raw_dimensions.get("storyline", 0), 0, 20),
+        "evidence_and_risk": clamp(raw_dimensions.get("evidence_and_risk", 0), 0, 15),
+        "slide_usability": clamp(raw_dimensions.get("slide_usability", 0), 0, 20),
+        "output_fit": clamp(raw_dimensions.get("output_fit", 0), 0, 10),
+    }
+    hard_penalty = clamp(judged.get("hard_penalty", 0), 0, 100)
+    failure_tags = sorted({tag for tag in judged.get("failure_tags", []) if tag in VALID_FAILURE_TAGS})
+    base = sum(dimension_scores.values())
+    return {
+        "sample_id": sample["id"],
+        "scorer": "judge",
+        "scenario": sample["scenario"],
+        "stakes": sample["stakes"],
+        "expected_delivery_mode": sample["expected_delivery_mode"],
+        "dimension_scores": dimension_scores,
+        "base_score": base,
+        "hard_penalty": hard_penalty,
+        "score": max(base - hard_penalty, 0),
+        "failure_tags": failure_tags,
+        "output_length_words": len(re.findall(r"\S+", output_text)),
+        "judge_rationale": judged.get("rationale", ""),
+    }
+
+
+def score_with_optional_judge(
+    text: str,
+    sample: dict,
+    judge_command: str | None,
+    rubric_text: str,
+    timeout: int,
+    fallback: bool,
+) -> dict:
+    deterministic = score_one(text, sample)
+    if not judge_command:
+        return deterministic
+    try:
+        judged = run_judge(judge_command, judge_prompt(sample, text, rubric_text), sample["id"], timeout)
+        result = normalize_judge_result(judged, sample, text)
+        result["deterministic_score"] = deterministic["score"]
+        return result
+    except Exception as exc:
+        if not fallback:
+            raise
+        deterministic["scorer"] = "deterministic_fallback"
+        deterministic["judge_error"] = str(exc)
+        return deterministic
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--skill-dir", default=".")
     parser.add_argument("--run-name", required=True)
+    parser.add_argument("--judge-command", help="Optional command template that reads {prompt_file} and returns/writes JSON judge scores.")
+    parser.add_argument("--judge-timeout", type=int, default=120, help="Seconds before a judge command times out.")
+    parser.add_argument("--no-fallback", action="store_true", help="Fail instead of using deterministic scoring when judge command fails.")
     args = parser.parse_args()
 
     skill_dir = Path(args.skill_dir).resolve()
     run_dir = skill_dir / "evaluation" / "runs" / args.run_name
     outputs_dir = run_dir / "outputs"
+    rubric_text = (skill_dir / "evaluation" / "scoring-rubric.md").read_text(encoding="utf-8")
     samples = {row["id"]: row for row in read_jsonl(skill_dir / "evaluation" / "validation_set.jsonl")}
     manifest_path = run_dir / "manifest.json"
     if manifest_path.exists():
@@ -251,7 +407,17 @@ def main() -> int:
         if not output_file.exists():
             missing.append(sample_id)
             continue
-        results.append(score_one(output_file.read_text(encoding="utf-8"), sample))
+        output_text = output_file.read_text(encoding="utf-8")
+        results.append(
+            score_with_optional_judge(
+                output_text,
+                sample,
+                args.judge_command,
+                rubric_text,
+                args.judge_timeout,
+                fallback=not args.no_fallback,
+            )
+        )
 
     tag_counts = Counter(tag for row in results for tag in row["failure_tags"])
     by_scenario: dict[str, list[int]] = defaultdict(list)
@@ -262,6 +428,8 @@ def main() -> int:
         "created_at": datetime.now(timezone.utc).isoformat(),
         "sample_count": len(results),
         "missing_outputs": missing,
+        "scorer": "judge" if args.judge_command else "deterministic",
+        "judge_command_used": bool(args.judge_command),
         "average_score": round(sum(row["score"] for row in results) / len(results), 2) if results else 0,
         "tag_counts": dict(tag_counts.most_common()),
         "scenario_scores": {scenario: round(sum(scores) / len(scores), 2) for scenario, scores in by_scenario.items()},

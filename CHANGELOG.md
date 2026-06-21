@@ -6,6 +6,8 @@
 
 - Added `summarize_evolution.py` to produce a readable report from evolution ledgers.
 - Added self-improvement `--agent-command` examples to the evaluation documentation.
+- Expanded the validation set from 30 to 60 samples, including complex material inputs, English presentation scenarios, handoff targets, quick talk tracks, and adversarial/safety cases.
+- Added optional `--judge-command` support to `score_outputs.py` for LLM-based semantic judging with deterministic fallback.
 
 ### Changed
 

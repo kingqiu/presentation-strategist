@@ -161,7 +161,7 @@ python3 presentation-strategist/scripts/validate_skill_package.py presentation-s
 - `presentation-strategist/evaluation/validation_set.jsonl`：验证样本。
 - `presentation-strategist/evaluation/scoring-rubric.md`：100 分制评分规则。
 - `presentation-strategist/scripts/run_validation.py`：生成验证任务，或通过 `--agent-command` 调用外部 agent。
-- `presentation-strategist/scripts/score_outputs.py`：自动评分并生成失败标签。
+- `presentation-strategist/scripts/score_outputs.py`：自动评分并生成失败标签；默认使用本地 deterministic scorer，也可以通过 `--judge-command` 接入 LLM judge。
 - `presentation-strategist/scripts/propose_candidate_edit.py`：根据失败标签提出小范围候选修改。
 - `presentation-strategist/scripts/gate_candidate.py`：比较当前版本和候选版本，决定接受或拒绝。
 - `presentation-strategist/scripts/summarize_evolution.py`：汇总进化日志，生成最近 N 轮的可读报告。
@@ -189,6 +189,17 @@ scripts/run_validation.py \
 ```
 
 `{prompt_file}`、`{output_file}`、`{sample_id}` 和 `{skill_dir}` 会由脚本自动填充。具体 CLI 参数请按你的 agent 环境调整。
+
+如果你想用 LLM judge 做更细的语义评分，可以给 `score_outputs.py` 传入 judge 命令：
+
+```text
+scripts/score_outputs.py \
+  --skill-dir . \
+  --run-name current \
+  --judge-command 'your-judge < {prompt_file} > {output_file}'
+```
+
+judge 需要返回结构化 JSON 分数；如果 judge 调用失败，脚本会默认回退到 deterministic scorer。
 
 ## 日志与隐私
 

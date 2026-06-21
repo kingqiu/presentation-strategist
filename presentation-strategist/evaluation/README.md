@@ -66,6 +66,45 @@ scripts/run_validation.py \
 
 Treat these as command templates. Adjust flags to match the agent CLI installed in your environment. The placeholders `{prompt_file}`, `{output_file}`, `{sample_id}`, and `{skill_dir}` are filled by `run_validation.py`.
 
+## Scoring Modes
+
+By default, `score_outputs.py` uses a deterministic local scorer. This is dependency-free and stable enough for smoke tests and regression checks.
+
+Default scoring:
+
+```bash
+scripts/score_outputs.py --skill-dir . --run-name current
+```
+
+For deeper semantic judging, pass a judge command. The judge command receives a prompt file containing the validation sample, output, and rubric. It must return JSON on stdout or write JSON to `{output_file}`.
+
+```bash
+scripts/score_outputs.py \
+  --skill-dir . \
+  --run-name current \
+  --judge-command 'your-judge < {prompt_file} > {output_file}'
+```
+
+Expected judge JSON:
+
+```json
+{
+  "dimension_scores": {
+    "goal_and_audience": 18,
+    "input_convergence": 12,
+    "storyline": 17,
+    "evidence_and_risk": 13,
+    "slide_usability": 16,
+    "output_fit": 9
+  },
+  "hard_penalty": 0,
+  "failure_tags": ["weak_evidence_handling"],
+  "rationale": "Brief reason for the score."
+}
+```
+
+If the judge command fails, times out, or returns invalid JSON, the script falls back to deterministic scoring and records `judge_error` on that sample. Use `--no-fallback` when you want judge failures to fail the run.
+
 ## What Gets Recorded
 
 Each evolution round records both detailed artifacts and a compact ledger entry.
