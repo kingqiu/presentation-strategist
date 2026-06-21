@@ -18,6 +18,7 @@ from pathlib import Path
 REQUIRED_FILES = [
     "SKILL.md",
     "VERSION",
+    "agents/compatibility.md",
     "agents/openai.yaml",
     "evaluation/README.md",
     "evaluation/scoring-rubric.md",
@@ -106,6 +107,32 @@ def validate_openai_yaml(root: Path, errors: list[str]) -> None:
         error(errors, "agents/openai.yaml default_prompt should mention $presentation-strategist.")
 
 
+def validate_agent_compatibility(root: Path, errors: list[str]) -> None:
+    path = root / "agents" / "compatibility.md"
+    if not path.exists():
+        return
+    text = path.read_text(encoding="utf-8")
+    required_terms = [
+        "Codex",
+        "Claude Code",
+        "OpenClaw",
+        "Hermes Agent",
+        "SKILL.md",
+        "agents/openai.yaml",
+    ]
+    for term in required_terms:
+        if term not in text:
+            error(errors, f"agents/compatibility.md should mention {term}.")
+    for install_path in [
+        "~/.codex/skills/presentation-strategist",
+        "~/.claude/skills/presentation-strategist",
+        "~/.openclaw/skills/presentation-strategist",
+        "~/.hermes/skills/presentation-strategist",
+    ]:
+        if install_path not in text:
+            error(errors, f"agents/compatibility.md missing install path: {install_path}")
+
+
 def validate_json_files(root: Path, errors: list[str]) -> None:
     json_file = root / "evaluation" / "feedback" / "records.schema.json"
     if json_file.exists():
@@ -152,6 +179,7 @@ def validate_scripts(root: Path, errors: list[str]) -> None:
         "gate_candidate.py",
         "improve_once.py",
         "summarize_evolution.py",
+        "check_agent_compatibility.py",
         "validate_skill_package.py",
         "package_skill.py",
     }
@@ -179,6 +207,7 @@ def main() -> int:
     validate_forbidden_files(root, errors, args.allow_runtime)
     validate_skill_md(root, errors)
     validate_openai_yaml(root, errors)
+    validate_agent_compatibility(root, errors)
     validate_json_files(root, errors)
     validate_scripts(root, errors)
 

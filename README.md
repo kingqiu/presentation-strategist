@@ -93,9 +93,11 @@
 ```text
 ~/.codex/skills/presentation-strategist
 ~/.claude/skills/presentation-strategist
-~/.openclaw/workspace/skills/presentation-strategist
+~/.openclaw/skills/presentation-strategist
 ~/.hermes/skills/presentation-strategist
 ```
+
+如果你的平台使用项目级 skill 目录，也可以把整个 `presentation-strategist/` 文件夹放到项目内的 skills 目录中。请保持文件夹名为 `presentation-strategist`。
 
 如果你的平台支持显式调用，可以这样使用：
 
@@ -104,6 +106,31 @@ Use $presentation-strategist to help me design this presentation.
 ```
 
 如果平台支持自动触发，当你提出“PPT 思路”“汇报逻辑”“pitch deck”“sales deck”“帮我想清楚怎么讲”等请求时，也可以自动调用。
+
+### 多 Agent 兼容性
+
+这个 Skill 的核心是通用 `SKILL.md` + Markdown references，不依赖 Codex 专用工具。不同 Agent 的差异主要在安装路径、自动发现机制和显式调用语法。
+
+| Agent | 支持状态 | 推荐安装路径 | 推荐用法 |
+| --- | --- | --- | --- |
+| Codex | 原生支持 | `~/.codex/skills/presentation-strategist` | `Use $presentation-strategist ...` 或自然语言自动触发 |
+| Claude Code | 兼容支持 | `~/.claude/skills/presentation-strategist` | “Load the presentation-strategist skill ...” |
+| OpenClaw | 兼容支持 | `~/.openclaw/skills/presentation-strategist` 或项目 skills 目录 | 让 OpenClaw 在处理 PPT 策略任务时加载该 Skill；如果它通过 Claude Code session 工作，也可安装到 Claude Code skills 目录 |
+| Hermes Agent | 兼容支持 | `~/.hermes/skills/presentation-strategist` | 让 Hermes 从 skills 目录加载该 Skill，或在任务前显式说明使用 presentation-strategist |
+
+各平台都应该读取 `SKILL.md` 作为主入口；`agents/openai.yaml` 只是 Codex/OpenAI UI 元数据，非 OpenAI 平台可以忽略。
+
+如果某个平台不能自动发现 Skill，可以在任务前加一句：
+
+```text
+Use the local presentation-strategist skill. Read its SKILL.md first, follow its scope guard, and only load referenced files when needed. The task is to design presentation logic and slide structure, not visual editing or PPTX generation.
+```
+
+更详细的跨 Agent 约定见：
+
+```text
+presentation-strategist/agents/compatibility.md
+```
 
 ## 常用用法
 
@@ -211,11 +238,12 @@ scripts/improve_once.py --skill-dir . --limit 10 --mode candidate
 
 ```text
 python3 presentation-strategist/scripts/validate_skill_package.py presentation-strategist
+python3 presentation-strategist/scripts/check_agent_compatibility.py presentation-strategist
 python3 scripts/package_skill.py --check
 python3 scripts/package_skill.py --clean
 ```
 
-这些命令会检查 skill 包结构，并确保运行时日志、反馈记录和本地缓存不会进入发布包。
+这些命令会检查 skill 包结构、多 Agent 兼容说明，并确保运行时日志、反馈记录和本地缓存不会进入发布包。
 
 ## 目录结构
 
@@ -223,6 +251,7 @@ python3 scripts/package_skill.py --clean
 presentation-strategist/
 ├── SKILL.md
 ├── agents/
+│   ├── compatibility.md
 │   └── openai.yaml
 ├── evaluation/
 ├── references/
@@ -238,6 +267,7 @@ presentation-strategist/
 - `scripts/` 存放验证、打包和自我改进相关脚本。
 - `templates/` 存放可复用的输出模板。
 - `agents/openai.yaml` 是 Codex 相关的界面元数据，其他平台可以忽略。
+- `agents/compatibility.md` 说明 Codex、Claude Code、OpenClaw、Hermes Agent 的安装、调用和降级策略。
 
 公开示例可以查看：
 
@@ -292,6 +322,7 @@ scripts/improve_once.py --skill-dir . --limit 10 --mode report-only
 - `presentation-strategist/evaluation/validation_set.jsonl`：验证样本。
 - `presentation-strategist/evaluation/scoring-rubric.md`：100 分制评分规则。
 - `presentation-strategist/scripts/improve_once.py`：普通用户的一键自我进化入口。
+- `presentation-strategist/scripts/check_agent_compatibility.py`：检查 Codex、Claude Code、OpenClaw、Hermes Agent 兼容说明是否齐全。
 - `presentation-strategist/scripts/run_validation.py`：生成验证任务，或通过 `--agent-command` 调用外部 agent。
 - `presentation-strategist/scripts/score_outputs.py`：自动评分并生成失败标签；默认使用本地 deterministic scorer，也可以通过 `--judge-command` 接入 LLM judge。
 - `presentation-strategist/scripts/propose_candidate_edit.py`：根据失败标签提出小范围候选修改。

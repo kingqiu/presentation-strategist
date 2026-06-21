@@ -24,6 +24,8 @@ TARGETS = {
 REQUIRED_FILES = [
     "SKILL.md",
     "VERSION",
+    "agents/compatibility.md",
+    "agents/openai.yaml",
     "references/business-scenarios.md",
     "references/strategic-communication-principles.md",
     "references/handoff-schema.md",
