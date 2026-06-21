@@ -105,6 +105,118 @@ Use $presentation-strategist to help me design this presentation.
 
 如果平台支持自动触发，当你提出“PPT 思路”“汇报逻辑”“pitch deck”“sales deck”“帮我想清楚怎么讲”等请求时，也可以自动调用。
 
+## 常用用法
+
+下面这些是最常见的使用方式。你可以直接复制其中的提示词，再替换成自己的业务背景。
+
+### 1. 从模糊想法生成汇报框架
+
+适合你只有一个大概主题，还没想清楚怎么讲的时候。
+
+```text
+Use $presentation-strategist 帮我设计一份给老板的项目进度汇报。我想让老板理解当前进展、主要风险，并决定是否给我两个工程师资源。
+```
+
+它会帮助你明确听众、真实目标、证据缺口、核心判断和逐页 slide 框架。
+
+### 2. 快速救急：只要口播或简版结构
+
+适合临近开会、上台、答辩、客户沟通时快速理清表达。
+
+```text
+Use $presentation-strategist 我15分钟后要讲新版报价策略，只要3分钟口播稿，不要完整PPT框架。
+```
+
+也可以要求：
+
+```text
+Use $presentation-strategist 帮我用5页PPT讲清楚这个方案，越快越好。
+```
+
+### 3. Review 现有大纲，找逻辑问题
+
+适合你已经有目录、大纲或初稿，但不确定逻辑是否成立。
+
+```text
+Use $presentation-strategist review这个大纲，不要重写：
+1 公司介绍
+2 产品功能
+3 客户案例
+4 报价
+5 Q&A
+客户是一家预算紧张的传统企业。
+```
+
+它会优先指出听众错位、证据缺口、弱 action title、孤立页面和风险被隐藏的地方。
+
+### 4. 只改标题或表达，不重做整份 PPT
+
+适合只想增强某几页的判断力和表达力度。
+
+```text
+Use $presentation-strategist 只帮我把这些标题改成更有判断力的action title，不要展开整份PPT：
+背景、市场机会、产品能力、客户案例、下一步。
+```
+
+### 5. 面向特定场景生成专业结构
+
+适合 sales deck、融资 pitch、AI 培训、技术评审、风险汇报等更明确的场景。
+
+```text
+Use $presentation-strategist 我们要给一家制造业客户做销售提案。客户觉得我们的系统太贵，希望这次汇报能让他们愿意先做一个PoC。帮我设计这份sales deck的逻辑。
+```
+
+```text
+Use $presentation-strategist 我要给公司中层做一场生成式AI普及培训，听众不是技术背景，而且担心AI会替代他们。帮我设计培训型PPT结构。
+```
+
+```text
+Use $presentation-strategist 我们发现一个数据安全风险，目前证据还不完整，但可能影响很大。我要给高层做风险汇报。
+```
+
+### 6. 生成给 AI PPT 工具的 brief
+
+当你已经认可前面的框架后，可以让它转成下游工具更容易使用的格式。
+
+```text
+把这个框架整理成 Gamma / Canva / Marp / AI PPT 工具能用的 brief。缺的数据不要编，用[占位符]保留。
+```
+
+它会输出 deck-level instructions、每页标题、页面意图、内容块、视觉建议和 speaker intent。
+
+### 7. 跑一轮自我进化报告
+
+普通用户不需要记住底层脚本，可以直接让 Agent 代跑：
+
+```text
+帮我给 presentation-strategist 跑一轮自我进化，抽10条验证样本，只生成报告，不要合并修改。
+```
+
+如果你想自己运行一键入口：
+
+```text
+cd presentation-strategist
+scripts/improve_once.py --skill-dir . --limit 10 --mode report-only
+```
+
+想生成候选版本但不自动接受：
+
+```text
+scripts/improve_once.py --skill-dir . --limit 10 --mode candidate
+```
+
+### 8. 打包和发布前检查
+
+分享或发布前，可以运行：
+
+```text
+python3 presentation-strategist/scripts/validate_skill_package.py presentation-strategist
+python3 scripts/package_skill.py --check
+python3 scripts/package_skill.py --clean
+```
+
+这些命令会检查 skill 包结构，并确保运行时日志、反馈记录和本地缓存不会进入发布包。
+
 ## 目录结构
 
 ```text
