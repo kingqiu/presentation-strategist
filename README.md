@@ -4,7 +4,11 @@
 
 一个帮助你先想清楚“怎么讲”，再去制作 PPT 的 Agent Skill。
 
-很多 PPT 工具擅长让页面变漂亮，但真正困难的往往不是配色、字体和模板，而是：
+很多 PPT 工具和 AI Skills 都在解决“怎么把页面做得更精良、更美观”：配色、字体、模板、图表、动画、版式。这些当然重要，但它们主要解决的是 PPT 的外形。
+
+`presentation-strategist` 想解决的是另一件事：**赋予 PPT 内核与灵魂**。
+
+一份真正有效的 PPT，不只是好看，也应该有清晰的判断、可信的证据、准确的听众洞察和能推动行动的故事线。它要回答：
 
 - 这场汇报到底要改变谁的想法？
 - 听众为什么应该相信你？
@@ -12,9 +16,7 @@
 - 哪些证据足够强，哪些还只是猜测？
 - 应该按什么顺序讲，才能让人听懂、相信，并愿意行动？
 
-`presentation-strategist` 关注的就是这些问题。
-
-它会帮助你把一个模糊的汇报需求，整理成一份更清晰、更有逻辑、更适合生成 PPT 的框架。
+`presentation-strategist` 关注的就是这些问题。它不是 PPT 美化工具，而是 PPT 的策略与表达内核工具。它会帮助你把一个模糊的汇报需求，整理成一份更清晰、更有逻辑、更有证据、更适合生成 PPT 的框架。
 
 ## 适合什么场景
 
@@ -110,14 +112,18 @@ presentation-strategist/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
+├── evaluation/
 ├── references/
+├── scripts/
 └── templates/
 ```
 
 其中：
 
 - `SKILL.md` 是主技能说明。
+- `evaluation/` 存放验证集、评分规则和自我改进记录结构。
 - `references/` 存放场景、框架、案例和质量检查规则。
+- `scripts/` 存放验证、打包和自我改进相关脚本。
 - `templates/` 存放可复用的输出模板。
 - `agents/openai.yaml` 是 Codex 相关的界面元数据，其他平台可以忽略。
 
@@ -133,6 +139,46 @@ examples/
 python3 scripts/package_skill.py --check
 python3 scripts/package_skill.py --clean
 ```
+
+验证单个 skill 包可以使用：
+
+```text
+python3 presentation-strategist/scripts/validate_skill_package.py presentation-strategist
+```
+
+## 自我进化引擎
+
+这个仓库包含一套实验性的 self-improvement loop，用来让 skill 在验证集上持续校准自己，而不是只靠人工凭感觉改规则。
+
+核心流程是：
+
+```text
+验证任务 -> 模型输出 -> 自动评分 -> 失败标签聚合 -> 候选修改 -> 门控接受/拒绝 -> 记录每轮结果
+```
+
+相关文件：
+
+- `presentation-strategist/evaluation/validation_set.jsonl`：验证样本。
+- `presentation-strategist/evaluation/scoring-rubric.md`：100 分制评分规则。
+- `presentation-strategist/scripts/run_validation.py`：生成验证任务，或通过 `--agent-command` 调用外部 agent。
+- `presentation-strategist/scripts/score_outputs.py`：自动评分并生成失败标签。
+- `presentation-strategist/scripts/propose_candidate_edit.py`：根据失败标签提出小范围候选修改。
+- `presentation-strategist/scripts/gate_candidate.py`：比较当前版本和候选版本，决定接受或拒绝。
+
+每一轮进化都会写入 `evaluation/runs/` 下的详细产物，并追加到 `evaluation/evolution_log.jsonl`。这些运行时记录不会进入发布包。
+
+## 日志与隐私
+
+自我进化流程可能会保存验证输入、模型输出、评分结果和候选修改建议。请不要把真实客户资料、公司机密、个人隐私或未脱敏业务数据直接写入公开仓库。
+
+发布包会自动排除：
+
+- `evaluation/runs/`
+- `evaluation/evolution_log.jsonl`
+- `evaluation/accepted_edits.jsonl`
+- `evaluation/rejected_edits.jsonl`
+- `evaluation/feedback/records.jsonl`
+- Python 缓存和本地临时文件
 
 ## 兼容性
 
@@ -159,4 +205,4 @@ python3 scripts/package_skill.py --clean
 ## 当前状态
 
 当前版本可以用于实际试跑和继续迭代。  
-建议在正式大规模发布前，继续用真实业务场景测试输出质量。
+它已经包含发布校验、打包清理和基础自我进化引擎。建议在正式大规模发布前，继续补充更多真实业务场景验证样本，并用干净安装流程做回归测试。
