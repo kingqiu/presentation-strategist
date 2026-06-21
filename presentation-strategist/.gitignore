@@ -1,0 +1,16 @@
+# Runtime records
+evaluation/runs/
+evaluation/evolution_log.jsonl
+evaluation/accepted_edits.jsonl
+evaluation/rejected_edits.jsonl
+evaluation/feedback/records.jsonl
+
+# Build outputs
+dist/
+*.zip
+
+# Local/generated files
+__pycache__/
+*.pyc
+.DS_Store
+

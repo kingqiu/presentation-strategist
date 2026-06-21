@@ -86,7 +86,17 @@ def package(targets: list[str], clean: bool) -> None:
         shutil.copytree(
             SKILL,
             dest,
-            ignore=shutil.ignore_patterns(".DS_Store", "__pycache__"),
+            ignore=shutil.ignore_patterns(
+                ".DS_Store",
+                "__pycache__",
+                "*.pyc",
+                "dist",
+                "runs",
+                "evolution_log.jsonl",
+                "accepted_edits.jsonl",
+                "rejected_edits.jsonl",
+                "records.jsonl",
+            ),
         )
         print(f"packaged {target}: {dest.relative_to(ROOT)}")
 

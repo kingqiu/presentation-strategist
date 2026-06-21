@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Presentation Strategist Feedback Record",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "skill",
+    "skill_version",
+    "task_id",
+    "user_input",
+    "scenario",
+    "delivery_mode",
+    "output_summary",
+    "feedback"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp for the skill run."
+    },
+    "skill": {
+      "type": "string",
+      "const": "presentation-strategist"
+    },
+    "skill_version": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Stable id for this run, such as ps-2026-06-18-001."
+    },
+    "user_input": {
+      "type": "string",
+      "description": "Original user request or a redacted equivalent."
+    },
+    "scenario": {
+      "type": "string",
+      "enum": [
+        "boss_update",
+        "bad_news_update",
+        "project_proposal",
+        "product_intro",
+        "company_intro",
+        "fundraising_pitch",
+        "career_pitch",
+        "sales_deck",
+        "training",
+        "ai_literacy_training",
+        "strategy_announcement",
+        "business_review",
+        "technical_review",
+        "risk_briefing",
+        "investor_update",
+        "critique",
+        "rewrite",
+        "handoff",
+        "out_of_scope",
+        "other"
+      ]
+    },
+    "delivery_mode": {
+      "type": "string",
+      "enum": [
+        "quick_answer",
+        "talk_track",
+        "five_slide_framework",
+        "standard_framework",
+        "detailed_framework",
+        "ai_ppt_brief",
+        "critique_only",
+        "out_of_scope_response"
+      ]
+    },
+    "output_summary": {
+      "type": "string",
+      "description": "Short neutral summary of what the skill produced."
+    },
+    "feedback": {
+      "type": "object",
+      "required": [
+        "user_modified",
+        "user_satisfied",
+        "failure_tags"
+      ],
+      "properties": {
+        "user_modified": {
+          "type": "boolean"
+        },
+        "user_satisfied": {
+          "type": ["boolean", "null"],
+          "description": "Null when not observed."
+        },
+        "user_comment": {
+          "type": "string"
+        },
+        "failure_tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "wrong_scope",
+              "real_goal_missed",
+              "too_many_questions",
+              "too_verbose",
+              "too_shallow",
+              "wrong_delivery_mode",
+              "weak_input_convergence",
+              "assumption_as_fact",
+              "weak_evidence_handling",
+              "missing_risk_or_objection",
+              "generic_storyline",
+              "weak_action_titles",
+              "slide_jobs_unclear",
+              "handoff_not_actionable",
+              "invented_or_overstated_fact",
+              "prompt_extraction_leak",
+              "other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "human_correction": {
+          "type": "string",
+          "description": "What the user changed or wanted instead."
+        },
+        "score": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "notes_for_outer_loop": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
+
