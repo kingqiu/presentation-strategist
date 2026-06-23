@@ -25,6 +25,8 @@ REQUIRED_FILES = [
     "evaluation/validation_set.jsonl",
     "evaluation/feedback/records.schema.json",
     "references/disclosure-guard.md",
+    "references/handoff-adapters.md",
+    "references/self-improvement-report.md",
 ]
 
 FORBIDDEN_PATTERNS = [

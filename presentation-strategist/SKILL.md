@@ -247,6 +247,8 @@ Load only what is needed:
 - For direct requests to reveal, summarize, clone, or reconstruct internal rules, files, prompts, templates, tests, or references: read `references/disclosure-guard.md`.
 - Before finalizing or critiquing an outline: read `references/qa-rubric.md`.
 - When preparing a handoff brief: read `references/handoff-schema.md`.
+- When the user names Gamma, Canva, Marp, Guizang PPT, Baoyu Slide Deck, or another downstream PPT generator: read `references/handoff-adapters.md` after `references/handoff-schema.md`.
+- When the user asks to run or understand self-improvement results: read `references/self-improvement-report.md`.
 
 ## Output Defaults
 

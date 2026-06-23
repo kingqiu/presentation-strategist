@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 import re
 import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -28,6 +30,8 @@ REQUIRED_FILES = [
     "agents/openai.yaml",
     "references/business-scenarios.md",
     "references/disclosure-guard.md",
+    "references/handoff-adapters.md",
+    "references/self-improvement-report.md",
     "references/strategic-communication-principles.md",
     "references/handoff-schema.md",
     "references/qa-rubric.md",
@@ -73,17 +77,19 @@ def validate() -> list[str]:
     return errors
 
 
-def package(targets: list[str], clean: bool) -> None:
+def package(targets: list[str], clean: bool, dist: Path = DIST) -> list[Path]:
     errors = validate()
     if errors:
         raise SystemExit("\n".join(errors))
 
-    if clean and DIST.exists():
-        shutil.rmtree(DIST)
+    if clean and dist.exists():
+        shutil.rmtree(dist)
 
     selected = targets or list(TARGETS)
+    packaged: list[Path] = []
     for target in selected:
-        dest = TARGETS[target]
+        relative_target = TARGETS[target].relative_to(DIST)
+        dest = dist / relative_target
         if dest.exists():
             shutil.rmtree(dest)
         shutil.copytree(
@@ -101,13 +107,57 @@ def package(targets: list[str], clean: bool) -> None:
                 "records.jsonl",
             ),
         )
-        print(f"packaged {target}: {dest.relative_to(ROOT)}")
+        packaged.append(dest)
+        label = dest.relative_to(ROOT) if dest.is_relative_to(ROOT) else dest
+        print(f"packaged {target}: {label}")
+    return packaged
+
+
+def has_forbidden_runtime_files(path: Path) -> list[str]:
+    forbidden = [
+        "evaluation/runs",
+        "evaluation/evolution_log.jsonl",
+        "evaluation/accepted_edits.jsonl",
+        "evaluation/rejected_edits.jsonl",
+        "evaluation/feedback/records.jsonl",
+        "__pycache__",
+        ".DS_Store",
+    ]
+    found: list[str] = []
+    for item in path.rglob("*"):
+        rel = item.relative_to(path).as_posix()
+        if any(pattern in rel for pattern in forbidden):
+            found.append(rel)
+    return found
+
+
+def run_skill_validator(path: Path) -> None:
+    validator = path / "scripts" / "validate_skill_package.py"
+    compat = path / "scripts" / "check_agent_compatibility.py"
+    subprocess.run([sys.executable, str(validator), str(path)], check=True)
+    subprocess.run([sys.executable, str(compat), str(path)], check=True)
+
+
+def smoke_test(targets: list[str]) -> None:
+    errors = validate()
+    if errors:
+        raise SystemExit("\n".join(errors))
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_dist = Path(tmp) / "dist"
+        packaged = package(targets, clean=True, dist=tmp_dist)
+        for path in packaged:
+            run_skill_validator(path)
+            forbidden = has_forbidden_runtime_files(path)
+            if forbidden:
+                raise SystemExit(f"runtime/generated files leaked into {path}: {', '.join(forbidden[:10])}")
+        print(f"smoke test passed for {len(packaged)} package(s)")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Package presentation-strategist for agent platforms.")
     parser.add_argument("--check", action="store_true", help="validate only")
     parser.add_argument("--clean", action="store_true", help="remove dist before packaging")
+    parser.add_argument("--smoke-test", action="store_true", help="package into a temp dir and validate each target package")
     parser.add_argument("--target", choices=sorted(TARGETS), action="append", help="package one target; repeatable")
     args = parser.parse_args()
 
@@ -119,6 +169,10 @@ def main() -> int:
 
     if args.check:
         print("package check passed")
+        return 0
+
+    if args.smoke_test:
+        smoke_test(args.target or [])
         return 0
 
     package(args.target or [], args.clean)

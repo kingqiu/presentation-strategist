@@ -5,12 +5,16 @@
 ### Added
 
 - Added `references/disclosure-guard.md` and routed internal-design extraction requests to it, reducing default `SKILL.md` context load.
+- Added `references/handoff-adapters.md` for Gamma, Canva, Marp, Guizang PPT, Baoyu Slide Deck, and generic AI PPT tool handoff.
+- Added `references/self-improvement-report.md` for plain-language self-improvement reporting.
 - Added three end-to-end golden examples for boss updates, sales decks, and AI training handoff briefs.
 - Expanded the validation set from 60 to 72 samples, with more coverage for talk tracks, bad-news updates, project proposals, investor updates, career pitches, handoff briefs, and prompt-extraction defenses.
 
 ### Changed
 
 - Slimmed the main `SKILL.md` by moving detailed disclosure-guard examples into a conditional reference.
+- Updated `improve_once.py` to write `user_report.md` for every self-improvement run.
+- Added a root `scripts/package_skill.py --smoke-test` flow that packages every target into a temporary directory, validates each skill package, checks agent compatibility, and rejects runtime log leaks.
 
 ## 0.2.0 - 2026-06-23
 

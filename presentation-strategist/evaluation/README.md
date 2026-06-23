@@ -35,6 +35,14 @@ Ask an agent in natural language:
 Run one presentation-strategist self-improvement cycle with 10 samples in report-only mode. Do not merge candidate edits.
 ```
 
+Each `improve_once.py` run writes a plain-language user report:
+
+```text
+evaluation/runs/<run-name>/user_report.md
+```
+
+Use this report first when explaining results to a normal user. It summarizes what happened, missing outputs, score signals, top failure tags, and the safest next action.
+
 The lower-level workflow is:
 
 Run the loop in five steps:
@@ -139,6 +147,7 @@ Per-run artifacts:
 - `evaluation/runs/<run>/scores.json`: per-sample scores, average score, failure tags, scenario scores, and output lengths.
 - `evaluation/runs/<current-run>/candidate_edit_proposal.json`: failure tags selected for improvement, target sections, edit type, and candidate skill path when created.
 - `evaluation/runs/<candidate-run>/gate_decision.json`: accept/reject decision, score delta, and blocker details.
+- `evaluation/runs/<run>/user_report.md`: plain-language report for normal users.
 
 Cross-round ledgers:
 
