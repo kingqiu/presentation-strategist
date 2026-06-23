@@ -1,6 +1,6 @@
 # 汇报策略师 Presentation Strategist
 
-当前版本：`v0.1.0`
+当前版本：`v0.2.0`
 
 一个帮助你先想清楚“怎么讲”，再去制作 PPT 的 Agent Skill。
 
