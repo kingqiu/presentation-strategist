@@ -27,6 +27,7 @@ REQUIRED_FILES = [
     "agents/compatibility.md",
     "agents/openai.yaml",
     "references/business-scenarios.md",
+    "references/disclosure-guard.md",
     "references/strategic-communication-principles.md",
     "references/handoff-schema.md",
     "references/qa-rubric.md",

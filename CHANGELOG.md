@@ -2,7 +2,15 @@
 
 ## Unreleased
 
-暂无。
+### Added
+
+- Added `references/disclosure-guard.md` and routed internal-design extraction requests to it, reducing default `SKILL.md` context load.
+- Added three end-to-end golden examples for boss updates, sales decks, and AI training handoff briefs.
+- Expanded the validation set from 60 to 72 samples, with more coverage for talk tracks, bad-news updates, project proposals, investor updates, career pitches, handoff briefs, and prompt-extraction defenses.
+
+### Changed
+
+- Slimmed the main `SKILL.md` by moving detailed disclosure-guard examples into a conditional reference.
 
 ## 0.2.0 - 2026-06-23
 

@@ -24,6 +24,7 @@ REQUIRED_FILES = [
     "evaluation/scoring-rubric.md",
     "evaluation/validation_set.jsonl",
     "evaluation/feedback/records.schema.json",
+    "references/disclosure-guard.md",
 ]
 
 FORBIDDEN_PATTERNS = [
